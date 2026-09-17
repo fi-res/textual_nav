@@ -118,11 +118,11 @@ class NavigationDrawer(BaseNavigationWidget, layout="vertical"):
         return (
             max(
                 (
-                    len(page.tab_name or "") + (4 if page.tab_icon else 0)
+                    len(page.tab_name or "") + (3 if page.tab_icon else 0)
                     for page in self.pages
                 )
             )
-            + 3
+            + 4
         )
 
 

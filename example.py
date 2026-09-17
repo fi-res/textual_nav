@@ -1,7 +1,7 @@
 from textual.widgets import Button, Static
 
 from textual_nav import NavApp, NavPage
-from textual_nav.widgets import NavigationBar, NavigationDrawer, NavigationRail
+from textual_nav.widgets import NavigationDrawer
 
 
 class Page1(NavPage, tab_name="Page 1", tab_icon="󰑹"):
@@ -23,7 +23,7 @@ class Page3(NavPage, tab_name="Page 3", tab_icon=""):
         self.switch(Page2())
 
 
-class Page4(NavPage, tab_name="Page 4 with veeeeery long name", tab_icon=""):
+class Page4(NavPage, tab_name="Page 4", tab_icon=""):
     def compose(self):
         yield Static("page 4")
         yield Button("go page 5")
@@ -50,22 +50,6 @@ class ExampleApp(NavApp):
         padding: 1;
     }
     """
-
-    # def compose_nav(self):
-    #     yield Button("page-1", id="page-1")
-    #     yield Button("page-2", id="page-2")
-    #     yield Button("page-3", id="page-3")
-    #     yield Button("page-4", id="page-4")
-
-    # def on_button_pressed(self, event: Button.Pressed):
-    #     if event.button.id == "page-1":
-    #         self.switch_screen(Page1())
-    #     if event.button.id == "page-2":
-    #         self.switch_screen(Page2())
-    #     if event.button.id == "page-3":
-    #         self.switch_screen(Page3())
-    #     if event.button.id == "page-4":
-    #         self.switch_screen(Page4())
 
 
 ExampleApp().run()
