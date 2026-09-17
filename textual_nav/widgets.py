@@ -33,11 +33,13 @@ class Tab(Widget):
             super().__init__()
             self.tab_name = tab_name
 
-    def __init__(self, *children: Widget, name: str):
+    def __init__(self, *children: Widget, name: str, set_tooltip: bool = False):
         super().__init__(*children)
         self.tab_name = name
         if self.app.current_tab == self.tab_name:
             self.add_class("current")
+        if set_tooltip:
+            self.tooltip = name
 
     def on_click(self):
         self.post_message(self.Clicked(self.tab_name))
@@ -47,13 +49,11 @@ class BaseNavigationWidget(Widget):
     app: "NavApp"
 
     def __init_subclass__(
-        cls,
-        layout: Literal["horizontal", "vertical"],
-        width: Literal["auto"] | int = "auto"
+        cls, layout: Literal["horizontal", "vertical"], set_tooltip: bool = False
     ):
         super().__init_subclass__()
         cls._layout = layout
-        cls._width = width
+        cls._set_tooltip = set_tooltip
 
     def __init__(self, pages: list[NavPage]):
         super().__init__()
@@ -61,7 +61,7 @@ class BaseNavigationWidget(Widget):
         self.styles.layout = self._layout
         if self._layout == "vertical":
             self.styles.height = "1fr"
-            self.styles.width = self._width
+            self.styles.width = "auto"
         else:
             self.styles.height = "auto"
             self.styles.width = "1fr"
@@ -73,11 +73,13 @@ class BaseNavigationWidget(Widget):
         for page in self.pages:
             assert page.tab_name, "Page should have tab_name to appear in navigation"
             yield Tab(
-                self.compose_tab(page.tab_name, page.tab_icon), name=page.tab_name
+                self.compose_tab(page.tab_name, page.tab_icon),
+                name=page.tab_name,
+                set_tooltip=self._set_tooltip
             )
 
 
-class NavigationRail(BaseNavigationWidget, layout="vertical", width=6):
+class NavigationRail(BaseNavigationWidget, layout="vertical", set_tooltip=True):
     DEFAULT_CSS = """
     NavigationRail {
         padding: 0;
@@ -85,12 +87,16 @@ class NavigationRail(BaseNavigationWidget, layout="vertical", width=6):
     }
     """
 
+    def __init__(self, pages: list[NavPage]):
+        super().__init__(pages)
+        self.styles.width = 6
+
     def compose_tab(self, name: str, icon: str | None = None):
         assert icon is not None, "Tab icon is required for navigation rail"
         return Static(icon)
 
 
-class NavigationDrawer(BaseNavigationWidget, layout="vertical", width="auto"):
+class NavigationDrawer(BaseNavigationWidget, layout="vertical"):
     DEFAULT_CSS = """
     NavigationDrawer {
         padding: 1;
@@ -116,29 +122,47 @@ class NavigationDrawer(BaseNavigationWidget, layout="vertical", width="auto"):
                     for page in self.pages
                 )
             )
-            + 2
+            + 3
         )
 
 
-# class NavigationBar(BaseNavigationWidget, layout="horizontal"):
-#     DEFAULT_CSS = """
-#     NavigationBar {
-#         padding: 2;
-#         background: $surface;
-#     }
-#     NavigationBar > Vertical {
-#         width: auto;
-#         height: auto;
-#     }
-#     NavigationBar Static {
-#         width: auto;
-#     }
-#     # NavigationBar {
-#     #     align: space-around; # why they still havent space between/around/evenly
-#     # }
-#     """
+class NavigationBar(BaseNavigationWidget, layout="horizontal"):
+    DEFAULT_CSS = """
+    NavigationBar {
+        padding: 0 1;
+        background: $surface;
+        height: auto;
+        align: center middle;
+    #     align: space-around; # why they still havent space between/around/evenly # maybe add fluxtual to this, somewhen..
+    }
+    NavigationBar > Tab {
+        width: auto;
+        margin-right: 3;
+    }
+    NavigationBar > Tab:last-child {
+        margin-right: 0;
+    }
+    NavigationBar > Tab > Vertical {
+        width: auto;
+        height: auto;
+    }
+    NavigationBar > Tab > Vertical > Static:first-child {
+        text-align: center;
+    }
+    NavigationBar Static {
+        width: auto;
+    }
+    """
 
-#     def compose_tab(self, name: str, icon: str | None = None):
-#         if icon:
-#             return Vertical(Static(icon), Static(name))
-#         return Static(name)
+    def compose_tab(self, name: str, icon: str | None = None):
+        if icon:
+            return Vertical(
+                Center(Static(icon)), Static(name, classes="navbar-tab-name")
+            )
+        return Static(name)
+
+    def on_mount(self):
+        for tab in self.query(Tab):
+            tab.query_one(Center).styles.width = len(
+                str(tab.query_one(".navbar-tab-name", Static).content)
+            )

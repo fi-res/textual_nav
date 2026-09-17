@@ -23,7 +23,7 @@ class Page3(NavPage, tab_name="Page 3", tab_icon=""):
         self.switch(Page2())
 
 
-class Page4(NavPage, tab_name="Page 4", tab_icon=""):
+class Page4(NavPage, tab_name="Page 4 with veeeeery long name", tab_icon=""):
     def compose(self):
         yield Static("page 4")
         yield Button("go page 5")
@@ -43,8 +43,8 @@ class Page5(NavPage, tab_name="Page 5"):
 
 class ExampleApp(NavApp):
     PAGES = [Page1(), Page2(), Page3(), Page4()]
-    NAV_TYPE = NavigationBar
-    NAV_POSITION = "bottom"
+    NAV_TYPE = NavigationDrawer
+    NAV_POSITION = "left"
     CSS = """
     NavPage {
         padding: 1;

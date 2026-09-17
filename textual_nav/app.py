@@ -11,7 +11,7 @@ from textual_nav.widgets import BaseNavigationWidget, Tab
 class Nav(Widget):
     DEFAULT_CSS = """
     Nav {
-        height: 100vh;
+        height: auto;
         width: auto;
     }
     """
@@ -33,11 +33,11 @@ class NavApp(App):
     _pages_stack: reactive[list[NavPage]] = reactive([], recompose=True)
     _page: NavPage
     nav_visible: reactive[bool] = reactive(True, recompose=True)
-    current_tab: str
+    current_tab: reactive[str] = reactive("", recompose=True)
 
     def __init__(self):
         super().__init__()
-        self.switch_page(self.DEFAULT_PAGE or self.PAGES[0], _initital=True)
+        self.switch_page(self.DEFAULT_PAGE or self.PAGES[0])
 
     def compose_nav(self) -> ComposeResult:
         assert self.NAV_TYPE, "set NAV_TYPE or override compose_nav"
@@ -48,18 +48,13 @@ class NavApp(App):
         page = self._resolve_page(page)
         self._pages_stack = [*self._pages_stack, page]  # append dont trigger reactive
 
-    def switch_page(self, page: NavPage | str, _initital: bool = False):
+    def switch_page(self, page: NavPage | str):
         """Switch to another page. New page will be highlighted. New page should exists in self.PAGES"""
         page: NavPage = self._resolve_page(page)
         assert page.tab_name, "Page should have name"
         self._page = page
         self._pages_stack = [page]
-        if not _initital:
-            self._get_current_tab().remove_class("current")  # unset prev tab
         self.current_tab = page.tab_name
-        self.call_after_refresh(
-            lambda: self._get_current_tab().add_class("current")
-        )  # set current tab
 
     def pop_page(self):
         """Pop current subpage (from push_screen)."""
