@@ -1,7 +1,9 @@
 from typing import Literal
 
 from textual.app import App, ComposeResult
+from textual.driver import Driver
 from textual.reactive import reactive
+from textual.types import CSSPathType
 from textual.widget import Widget
 
 from textual_nav.page import NavPage
@@ -35,8 +37,14 @@ class NavApp(App):
     nav_visible: reactive[bool] = reactive(True, recompose=True)
     current_tab: reactive[str] = reactive("", recompose=True)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(
+        self,
+        driver_class: type[Driver] | None = None,
+        css_path: CSSPathType | None = None,
+        watch_css: bool = False,
+        ansi_color: bool | None = None
+    ):
+        super().__init__(driver_class, css_path, watch_css, ansi_color)
         self.switch_page(self.DEFAULT_PAGE or self.PAGES[0])
 
     def compose_nav(self) -> ComposeResult:
