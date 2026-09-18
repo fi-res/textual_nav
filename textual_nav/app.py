@@ -29,11 +29,12 @@ class Nav(Widget):
 
 class NavApp(App):
     NAV_POSITION: Literal["left", "right", "top", "bottom"] = "left"
-    PAGES: list[NavPage]
+    PAGES: list[NavPage | type[NavPage]]
     NAV_TYPE: type[BaseNavigationWidget] | None = None
     DEFAULT_PAGE: NavPage | None = None
     _pages_stack: reactive[list[NavPage]] = reactive([], recompose=True)
     _page: NavPage
+    _pages_cache: list[NavPage] = []
     nav_visible: reactive[bool] = reactive(True, recompose=True)
     current_tab: reactive[str] = reactive("", recompose=True)
 
@@ -51,14 +52,14 @@ class NavApp(App):
         assert self.NAV_TYPE, "set NAV_TYPE or override compose_nav"
         yield self.NAV_TYPE(self.PAGES)
 
-    def push_page(self, page: NavPage | str):
+    def push_page(self, page: NavPage | type[NavPage] | str, *args, **kwargs):
         """Push new subpage (current page still will be highlighted)"""
-        page = self._resolve_page(page)
+        page = self._resolve_page(page, *args, **kwargs)
         self._pages_stack = [*self._pages_stack, page]  # append dont trigger reactive
 
-    def switch_page(self, page: NavPage | str):
+    def switch_page(self, page: NavPage | type[NavPage] | str, *args, **kwargs):
         """Switch to another page. New page will be highlighted. New page should exists in self.PAGES"""
-        page: NavPage = self._resolve_page(page)
+        page: NavPage = self._resolve_page(page, *args, **kwargs)
         assert page.tab_name, "Page should have name"
         self._page = page
         self._pages_stack = [page]
@@ -69,20 +70,28 @@ class NavApp(App):
         assert len(self._pages_stack) > 1, "No pages to pop"
         self._pages_stack = self._pages_stack[:-1]  # pop dont trigger reactive
 
-    def _resolve_page(self, page: NavPage | str):
-        if isinstance(page, str):
-            _page = next((p for p in self.PAGES if p.tab_name == page), None)
-            if _page is None:
-                raise RuntimeError(f"Page {page!r} not found")
-            return _page
-        return page
+    def _resolve_page(self, page: NavPage | type[NavPage] | str, *args, **kwargs):
+        if isinstance(page, NavPage):
+            return page
 
-    def _get_current_tab(self) -> Tab:
-        return next(
-            tab
-            for tab in self.query_one(Nav).query(Tab)
-            if tab.tab_name == self.current_tab
-        )
+        if cached_page := next(
+            (p for p in self._pages_cache if p.tab_name == page or p is page), None
+        ):
+            return cached_page
+        if isinstance(page, str):
+            if instance := next((p for p in self.PAGES if p.tab_name == page), None):
+                instance = (
+                    instance
+                    if isinstance(instance, NavPage)
+                    else instance(*args, **kwargs)
+                )
+                self._pages_cache.append(instance)
+                return instance
+            raise RuntimeError(f"Page {page!r} not found")
+
+        instance = page if isinstance(page, NavPage) else page(*args, **kwargs)
+        self._pages_cache.append(instance)
+        return instance
 
     def compose(self):
         if self.nav_visible:

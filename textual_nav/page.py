@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 class NavPage(Widget):
     app: "NavApp"
+    CAN_CACHE = True
 
     def __init_subclass__(
         cls, tab_name: str | None = None, tab_icon: str | None = None
@@ -19,8 +20,8 @@ class NavPage(Widget):
     def pop(self):
         self.app.pop_page()
 
-    def push(self, page: "NavPage | str"):
-        self.app.push_page(page)
+    def push(self, page: "NavPage | type[NavPage] | str", *args, **kwargs):
+        self.app.push_page(page, *args, **kwargs)
 
-    def switch(self, page: "NavPage | str"):
-        self.app.switch_page(page)
+    def switch(self, page: "NavPage | type[NavPage] | str", *args, **kwargs):
+        self.app.switch_page(page, *args, **kwargs)

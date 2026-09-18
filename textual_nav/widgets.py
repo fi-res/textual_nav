@@ -55,7 +55,7 @@ class BaseNavigationWidget(Widget):
         cls._layout = layout
         cls._set_tooltip = set_tooltip
 
-    def __init__(self, pages: list[NavPage]):
+    def __init__(self, pages: list[NavPage | type[NavPage]]):
         super().__init__()
         self.pages = pages
         self.styles.layout = self._layout
@@ -87,7 +87,7 @@ class NavigationRail(BaseNavigationWidget, layout="vertical", set_tooltip=True):
     }
     """
 
-    def __init__(self, pages: list[NavPage]):
+    def __init__(self, pages: list[NavPage | type[NavPage]]):
         super().__init__(pages)
         self.styles.width = 6
 
