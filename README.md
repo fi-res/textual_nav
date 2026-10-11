@@ -47,6 +47,7 @@ Base app class.
  - `PAGES` (list of instances of `NavPage`): List of pages to show. Required.
  - `DEFAULT_PAGE` (instance of `NavPage`): Default page to be opened on app startup. If not passed, first page from `PAGES` will be used.
  - `nav_visible` (reactive - bool): Is navigation bar visible. Defaults to `true`.
+ - `page_visible` (reactive - bool): Is page contents visible. Defaults to `true`.
 
 #### Methods
  - `compose_nav`: Compose navigation bar. Required to override if `NAV_TYPE` not passed.
@@ -55,7 +56,7 @@ Base app class.
  - `switch_screen`: Switch current page to another one. Stack of subpages will be cleaned.
 
  > [!NOTE]
- > Please do not override `compose` method. Content will be composed from `compose_nav` and the most top page in the stack.
+ > Please do not override `compose` method. Content will be composed from `compose_nav` / `NAV_TYPE` and the most top page in the stack.
 
 ### NavPage
 Base page class. When inheriting from this class, you can add `tab_name` and `tab_icon` to display it in navigation container:
@@ -70,10 +71,10 @@ class MyPage(NavPage, tab_name='My new page', tab_icon='+'):
 ### Customization
 Navbar appearance can be configured in css:
 ```css
-Tab {
+NavTab {
     background: blue;
 }
-Tab.current {
+NavTab.current {
     background: red;
 }
 NavigationDrawer {
