@@ -96,6 +96,6 @@ class NavApp(App):
             elif self.NO_CONTENT_NOTICE:
                 yield Static("[no content]")
 
-    def on_tab_clicked(self, event: NavTab.Clicked):
+    def on_nav_tab_clicked(self, event: NavTab.Clicked):
         event.stop()
         self.switch_page(event.tab_name)
