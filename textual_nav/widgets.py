@@ -106,10 +106,10 @@ class NavigationDrawer(BaseNavigationWidget, layout="vertical"):
         padding: 1;
         background: $surface;
     }
-    NavigationDrawer > Tab {
+    NavigationDrawer > NavTab {
         margin-bottom: 1;
     }
-    NavigationDrawer > Tab:last-child {
+    NavigationDrawer > NavTab:last-child {
         margin-bottom: 0;
     }
 
@@ -139,18 +139,18 @@ class NavigationBar(BaseNavigationWidget, layout="horizontal"):
         align: center middle;
     #     align: space-around; # why they still havent space between/around/evenly # maybe add fluxtual to this, somewhen..
     }
-    NavigationBar > Tab {
+    NavigationBar > NavTab {
         width: auto;
         margin-right: 3;
     }
-    NavigationBar > Tab:last-child {
+    NavigationBar > NavTab:last-child {
         margin-right: 0;
     }
-    NavigationBar > Tab > Vertical {
+    NavigationBar > NavTab > Vertical {
         width: auto;
         height: auto;
     }
-    NavigationBar > Tab > Vertical > Static:first-child {
+    NavigationBar > NavTab > Vertical > Static:first-child {
         text-align: center;
     }
     NavigationBar Static {
