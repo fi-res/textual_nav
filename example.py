@@ -8,6 +8,9 @@ class Page1(NavPage, tab_name="Page 1", tab_icon="󰑹"):
     def compose(self):
         yield Static("page 1")
 
+    def on_mount(self):
+        self.notify("load")
+
 
 class Page2(NavPage, tab_name="Page 2", tab_icon=""):
     def compose(self):
@@ -19,6 +22,9 @@ class Page2(NavPage, tab_name="Page 2", tab_icon=""):
     def on_button_pressed(self, event: Button.Pressed):
         self.push(Page6, int(event.button.id.removeprefix("p")))
 
+    def on_mount(self):
+        self.notify("load")
+
 
 class Page3(NavPage, tab_name="Page 3", tab_icon=""):
     def compose(self):
@@ -26,13 +32,16 @@ class Page3(NavPage, tab_name="Page 3", tab_icon=""):
         yield Button("go page 2")
 
     def on_button_pressed(self):
-        self.switch(Page2())
+        self.switch("Page 2")
 
 
-class Page4(NavPage, tab_name="Профиль", tab_icon=""):
+class Page4(NavPage, tab_name="Page 4", tab_icon=""):
     def compose(self):
         yield Static("page 4")
         yield Button("go page 5")
+
+    def on_mount(self):
+        self.notify("load")
 
     def on_button_pressed(self):
         self.push(Page5())
@@ -59,6 +68,9 @@ class Page6(NavPage, tab_name="Page 6"):
 
     def on_button_pressed(self):
         self.pop()
+
+    def on_mount(self):
+        self.notify("load")
 
 
 class ExampleApp(NavApp):

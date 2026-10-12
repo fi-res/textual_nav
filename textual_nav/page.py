@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 class NavPage(Widget):
     app: "NavApp"
     CAN_CACHE = True
+    _disposable = False
 
     def __init_subclass__(
         cls, tab_name: str | None = None, tab_icon: str | None = None
